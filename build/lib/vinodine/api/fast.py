@@ -1,5 +1,7 @@
 import pandas as pd
 # $WIPE_BEGIN
+from vinodine.ml_logic.registry import load_model
+from vinodine.ml_logic.preprocessor import preprocess_features
 # $WIPE_END
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -26,7 +28,6 @@ app.add_middleware(
 # and then store the model in an `app.state.model` global variable, accessible across all routes!
 # This will prove very useful for the Demo Day
 app.state.model = load_model()
-
 # $WIPE_END
 # http://127.0.0.1:8000/predict?pickup_datetime=2012-10-06 12:10:20&pickup_longitude=40.7614327&pickup_latitude=-73.9798156&dropoff_longitude=40.6513111&dropoff_latitude=-73.8803331&passenger_count=2
 @app.get("/predict")
