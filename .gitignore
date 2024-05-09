@@ -1,1 +1,4 @@
 raw_data/
+*.csv
+.env
+.ipynb_checkpoints/
