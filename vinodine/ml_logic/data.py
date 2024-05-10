@@ -27,8 +27,8 @@ def create_binary_df(file_path):
         columns=mlb_harm.classes_
         ))
     wine_df_bin.drop(columns=['Harmonize'], inplace=True)
-    
-    # Create a list of the kind of grapes that are mentioned less then 2.000 times
+
+    # Create a list of the kind of food that are mentioned less then 2.000 times
     harm_list = wine_df_bin.iloc[:,15:].sum() # sum the number of times a food is mentioned via column
     harm_to_drop = harm_list[harm_list<=15_000].index.to_list() # create a list withe kind of food mentioned less then 50 times
     wine_df_bin.drop(columns=harm_to_drop, inplace=True) # drop columns with food not mentioned more then 50 times
@@ -38,5 +38,3 @@ def create_binary_df(file_path):
     wine_df_bin_cleaned = wine_df_bin.drop(columns=['WineName', 'WineID','Code','Country','RegionID','RegionName','WineryID','Website','Vintages', 'WineryName'])
 
     return wine_df_bin_cleaned
-
-
