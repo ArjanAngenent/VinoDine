@@ -1,62 +1,68 @@
 import pandas as pd
-# $WIPE_BEGIN
-# $WIPE_END
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split, cross_val_score
+from sklearn.preprocessing import OneHotEncoder, OrdinalEncoder, StandardScaler, MinMaxScaler
+from sklearn.multioutput import MultiOutputClassifier
+from sklearn.linear_model import SGDClassifier, LogisticRegression, LinearRegression
+from sklearn.metrics import accuracy_score, classification_report
+from sklearn.preprocessing import MultiLabelBinarizer
+from sklearn.pipeline import make_pipeline
+from sklearn.compose import make_column_transformer, make_column_selector
+from sklearn.multiclass import OneVsRestClassifier
+from imblearn.over_sampling import RandomOverSampler
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import pickle
-
-file_path = '~/code/ArjanAngenent/VinoDine/X_processed.pkl'
-# Load the pickle file
-with open(file_path, 'rb') as f:
-    preprocessor = pickle.load(f)
+from vinodine.ml_logic.model import open_model
+from vinodine.ml_logic.data import create_X_pred
 
 app = FastAPI()
-# Allowing all middleware is optional, but good practice for dev purposes
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],  # Allows all origins
-    allow_credentials=True,
-    allow_methods=["*"],  # Allows all methods
-    allow_headers=["*"],  # Allows all headers
-)
-# $WIPE_BEGIN
-# :bulb: Preload the model to accelerate the predictions
-# We want to avoid loading the heavy Deep Learning model from MLflow at each `get("/predict")`
-# The trick is to load the model in memory when the Uvicorn server starts
-# and then store the model in an `app.state.model` global variable, accessible across all routes!
-# This will prove very useful for the Demo Day
-app.state.model = load_model()
 
-# $WIPE_END
-# http://127.0.0.1:8000/predict?pickup_datetime=2012-10-06 12:10:20&pickup_longitude=40.7614327&pickup_latitude=-73.9798156&dropoff_longitude=40.6513111&dropoff_latitude=-73.8803331&passenger_count=2
+model_open_path="~/code/VinoDine/"
+app.state.model = open_model(model_open_path)
+
 @app.get("/predict")
 def predict(
         Type: str,
         ABV: float,
         Body: str,
         Acidity: str
-    ):      # 1
-    """
-    Make a single food prediction.
+    ):      
 
-    """
-    # $CHA_BEGIN
-    # :bulb: Optional trick instead of writing each column name manually:
-    # locals() gets us all of our arguments back as a dictionary
-    # https://docs.python.org/3/library/functions.html#locals
-    X_pred = pd.DataFrame(locals(), index=[0])
+    # Make a single food prediction.
+    X_pred = pd.DataFrame.from_dict({'Type': [Type],
+                                    'Body': [Body],
+                                    'Acidity': [Acidity],
+                                    'ABV': [ABV]},
+                                   orient='columns')
+    
+    y_pred = app.state.model.predict(X_pred)
 
-    model = app.state.model
-    assert model is not None
-    #X_processed = preprocess_features(X_pred)
-    y_pred = model.predict(preprocessor.transform(X_pred))
-    # :warning: fastapi only accepts simple Python data types as a return value
-    # among them dict, list, str, int, float, bool
-    # in order to be able to convert the api response to JSON
-    return dict(fare=float(y_pred))
-    # $CHA_END
+    foods = ['Beef', 'CuredMeat', 'GameMeat', 'Lamb', 'Pasta', 'Pork', 'Poultry', 'RichFish', 'Shellfish', 'Veal', 'Vegetarian']
+    foods_index = np.where(y_pred[0]==1)[0].tolist()
+    foods_to_choose = []
+    for i in foods_index:
+        foods_to_choose.append(foods[i])
+    
+    return {"foods": foods_to_choose}
+
+  
+
+
+    
 @app.get("/")
 def root():
     # $CHA_BEGIN
-    return dict(greeting="Hello")
+    return dict(greeting=“Hello”)
     # $CHA_END
+
+
+
+
+
+# 'Varietal/100%',
+y_pred = model.predict(create_X_pred('Red', 'Full-bodied', 'Medium', 7.8))
+
+# 'Varietal/100%',
+show_foods(y_train, y_pred)
