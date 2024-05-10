@@ -44,3 +44,15 @@ def open_model(model_open_path):
     with open(model_open_path, "rb") as f:
         model = pickle.load(f)
     return model
+
+def pred(model, X_pred: pd.DataFrame):
+
+    y_pred = model.predict(X_pred)
+
+    foods = ['Beef', 'CuredMeat', 'GameMeat', 'Lamb', 'Pasta', 'Pork', 'Poultry', 'RichFish', 'Shellfish', 'Veal', 'Vegetarian']
+    foods_index = np.where(y_pred[0]==1)[0].tolist()
+    foods_to_choose = []
+    for i in foods_index:
+        foods_to_choose.append(foods[i])
+
+    return {"foods": foods_to_choose}
