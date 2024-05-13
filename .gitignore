@@ -1,5 +1,5 @@
 *.pkl
-
+notebook/*.pkl
 raw_data/
 *.csv
 .env
