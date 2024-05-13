@@ -32,7 +32,7 @@ def create_X_train_y_train(df, test_size=0.3):
     X = df[['Type','Body','Acidity', 'ABV']]
     y = df.drop(columns=['Type','Elaborate','Body','Acidity', 'ABV'])
     X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=42, test_size=test_size)
-    return X_train, X_test, y_train, y_test
+    return X_train, X_test, y_train, y_testb
 
 def save_model(model, model_save_path):
     # Save the model as a pickle file
