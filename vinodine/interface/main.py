@@ -5,7 +5,7 @@ import pandas as pd
 
 file_path = "~/code/ArjanAngenent/VinoDine/raw_data/Cleaned_Full_100K_wines.csv"
 
-model_save_path = 'model.pkl'
+model_save_path = 'models/model.pkl'
 
 # Loading and binary encoding source data frame("grape_column": retrieving last column for binary encoded grapes to create X)
 wine_df, grape_colum = create_binary_df(file_path)
