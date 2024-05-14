@@ -10,9 +10,9 @@ app.add_middleware(CORSMiddleware,
                    allow_headers=["*"])
 
 
-model_open_path = 'model.pkl'
+model_open_path = 'models/model.pkl'
 app.state.model = open_model(model_open_path)
-
+UnboundLocalError
 
 @app.get('/')
 def root():

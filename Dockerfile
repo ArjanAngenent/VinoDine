@@ -8,7 +8,7 @@ RUN pip install -r requirements.txt
 COPY vinodine vinodine
 COPY setup.py setup.py
 
-COPY model.pkl model.pkl
+COPY models/model.pkl models/model.pkl
 
 RUN pip install .
 
