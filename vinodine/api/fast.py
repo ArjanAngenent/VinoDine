@@ -1,41 +1,38 @@
-import pandas as pd
-import numpy as np
-from fastapi import FastAPI
+from vinodine.ml_logic.model import open_model, create_X_pred, pred
+from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
-from vinodine.ml_logic.model import open_model
+from typing import List
 
 app = FastAPI()
+app.add_middleware(CORSMiddleware,
+                   allow_origins=["*"],
+                   allow_methods=["*"],
+                   allow_headers=["*"])
 
-model_open_path="model.pkl"
+
+model_open_path = 'model.pkl'
 app.state.model = open_model(model_open_path)
 
-@app.get("/predict")
-def predict(
-        Type: str,
-        ABV: float,
-        Body: str,
-        Acidity: str
-    ):
 
-    # Make a single food prediction.
-    X_pred = pd.DataFrame.from_dict({'Type': [Type],
-                                    'Body': [Body],
-                                    'Acidity': [Acidity],
-                                    'ABV': [ABV]},
-                                   orient='columns')
-
-    y_pred = app.state.model.predict(X_pred)
-
-    foods = ['Beef', 'CuredMeat', 'GameMeat', 'Lamb', 'Pasta', 'Pork', 'Poultry', 'RichFish', 'Shellfish', 'Veal', 'Vegetarian']
-    foods_index = np.where(y_pred[0]==1)[0].tolist()
-    foods_to_choose = []
-    for i in foods_index:
-        foods_to_choose.append(foods[i])
-
-    return {"foods": foods_to_choose}
-
-@app.get("/")
+@app.get('/')
 def root():
-    # $CHA_BEGIN
-    return dict(greeting='Hello')
-    # $CHA_END
+    return {'greeting': 'Hello'}
+
+
+@app.get('/predict')
+def predict(Type: str,
+            ABV: float,
+            Body: str,
+            Acidity: str,
+            grapes: List[str] = Query('grape')):
+    # create managebale X_pred for model from API request
+    X_pred = create_X_pred(Type = Type,
+                           ABV = ABV,
+                           Body = Body,
+                           Acidity = Acidity,
+                           grapes = grapes)
+
+    # return suggested foods based on pretrained model and X_pred created from API request
+    y_pred_foods = pred(app.state.model, X_pred)
+
+    return y_pred_foods
