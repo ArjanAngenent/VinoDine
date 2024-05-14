@@ -1,4 +1,4 @@
-model.pkl
+.pkl
 raw_data/
 *.csv
 .env
