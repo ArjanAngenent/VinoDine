@@ -1,16 +1,15 @@
-FROM tensorflow/tensorflow:2.10.0
+FROM python:3.10.6-buster
 
 WORKDIR /prod
 
-COPY requirements.txt requirements.txt
+COPY requirements_prod.txt requirements.txt
+RUN pip install -r requirements.txt
 
 COPY vinodine vinodine
-
-COPY model.py model.py
-
-RUN pip install --no-cache-dir -r requirements.txt
-
 COPY setup.py setup.py
 
-#the actual name of the Python script
+COPY models/model.pkl models/model.pkl
+
+RUN pip install .
+
 CMD uvicorn vinodine.api.fast:app --host 0.0.0.0 --port $PORT

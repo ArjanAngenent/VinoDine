@@ -1,0 +1,12 @@
+pandas
+numpy
+scikit-learn
+scikit-multilearn
+
+fastapi
+typing
+
+uvicorn
+python-dotenv
+
+pickle5
